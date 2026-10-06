@@ -1,0 +1,63 @@
+"use client"
+
+import { authClient } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
+
+
+const SignUpPage = () => {
+    const onSubmit = async(e:React.SubmitEvent<HTMLElement>)=>{
+          e.preventDefault()
+          const formData = new FormData(e.target)
+          const user = Object.fromEntries(formData.entries()) as {name:string, email:string, password:string, image:string,}
+          const {data, error} = await authClient.signUp.email({
+            ...user,
+            callbackURL:"/"
+          })
+          if(data){
+            console.log(data)
+            redirect("/")
+          }
+          if(error){
+              console.log(error)
+          }
+
+        
+    }
+    const handleSignInWithGoogle=async()=>{
+    await authClient.signIn.social({
+        provider:"google",
+      })
+    }
+    const handleSignInWithGithub = async()=>{
+    await authClient.signIn.social({
+        provider:"github"
+      })
+    }
+  return (
+    <div className="mt-5">
+        <h2 className="font-semibold text-2xl text-red-700 text-center">সাইন আপ</h2>
+      <form onSubmit={onSubmit}>
+        <fieldset className="fieldset  rounded-box w-xs ">
+
+          <label className="label">নাম</label>
+          <input name="name" type="text" className="input" placeholder="Name" />
+          <label className="label">ImageUrl</label>
+          <input name="image" type="url" className="input" placeholder="Image" />
+          <label className="label">ইমেইল</label>
+          <input name="email" type="email" className="input" placeholder="Email" />
+
+          <label className="label">পাসওয়ার্ড</label>
+          <input name="password" type="password" className="input" placeholder="Password" />
+
+          <button type="submit" className="btn bg-red-700 text-white mt-4">সাইন আপ করুন</button>
+        </fieldset>
+      </form>
+      <div className="flex flex-col gap-2 mt-2 items-center justify-center">
+      <button onClick={handleSignInWithGoogle} className="btn ">Google দিয়ে সাইন ইন করুন</button>
+      <button onClick={handleSignInWithGithub} className="btn ">Github দিয়ে সাইন ইন করুন</button>
+      </div>
+    </div>
+  );
+};
+
+export default SignUpPage;
